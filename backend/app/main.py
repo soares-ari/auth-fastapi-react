@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from app.routes import auth
 
 # Instância principal da API
 app = FastAPI(title="Sistema de Autenticação", version="1.0")
+
+app.include_router(auth.router)
 
 # Rota de teste temporária
 @app.get("/")
