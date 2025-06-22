@@ -8,6 +8,7 @@ from app.models.user import User
 from app.database.session import SessionLocal
 from app.core.security import get_password_hash, verify_password
 from app.core.token import create_access_token
+from app.core.dependencies import get_current_user
 from app.database.session import get_db
 
 router = APIRouter()
@@ -28,6 +29,7 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     # Busca usuário pelo e-mail
@@ -38,3 +40,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     # Cria o token com email como "sub"
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.get("/me", response_model=UserRead)
+def read_logged_user(current_user: User = Depends(get_current_user)):
+    return current_user
